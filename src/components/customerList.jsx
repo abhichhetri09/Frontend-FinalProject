@@ -3,8 +3,10 @@ import Snackbar from "@mui/material/Snackbar";
 import Button from "@mui/material/Button";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
 import "ag-grid-community/styles/ag-theme-material.css";
+ // Core grid CSS, required
+
+
 import AddCustomer from "./addCustomer";
 import EditCustomer from "./editCustomer";
 import AddTraining from "./addTraining";
