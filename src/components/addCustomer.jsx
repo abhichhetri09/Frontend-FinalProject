@@ -1,21 +1,20 @@
-import React, { useState } from 'react';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogTitle from '@mui/material/DialogTitle';
+import React, { useState } from "react";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 
 export default function AddCustomer(props) {
-
   const [customer, setCustomer] = useState({
-    firstname: '',
-    lastname: '',
-    streetaddress: '',
-    postcode: '',
-    city: '',
-    email: '',
-    phone: ''
+    firstname: "",
+    lastname: "",
+    streetaddress: "",
+    postcode: "",
+    city: "",
+    email: "",
+    phone: "",
   });
 
   const [open, setOpen] = useState(false);
@@ -45,13 +44,12 @@ export default function AddCustomer(props) {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>New Customer</DialogTitle>
         <DialogContent>
-     
           <TextField
             margin="dense"
             label="FirstName"
             name="firstname"
             value={customer.firstname}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             variant="standard"
             fullWidth
           />
@@ -59,7 +57,7 @@ export default function AddCustomer(props) {
             margin="dense"
             label="Lastname"
             value={customer.lastname}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="lastname"
             variant="standard"
             fullWidth
@@ -68,7 +66,7 @@ export default function AddCustomer(props) {
             margin="dense"
             label="StreetAddress"
             value={customer.streetaddress}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="streetaddress"
             variant="standard"
             fullWidth
@@ -77,7 +75,7 @@ export default function AddCustomer(props) {
             margin="dense"
             label="PostCode"
             value={customer.postcode}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="postcode"
             variant="standard"
             fullWidth
@@ -86,25 +84,25 @@ export default function AddCustomer(props) {
             margin="dense"
             label="City"
             value={customer.city}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="city"
             variant="standard"
             fullWidth
           />
-           <TextField
+          <TextField
             margin="dense"
             label="Email"
             value={customer.email}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="email"
             variant="standard"
             fullWidth
           />
-           <TextField
+          <TextField
             margin="dense"
             label="Phone"
             value={customer.phone}
-            onChange={e => handleInputChange(e)}
+            onChange={(e) => handleInputChange(e)}
             name="phone"
             variant="standard"
             fullWidth

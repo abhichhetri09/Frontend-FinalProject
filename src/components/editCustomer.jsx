@@ -55,8 +55,10 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
 
   setOpen(true);
   }
+
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
+    
   };
 
   const handleSave = () => {
@@ -74,17 +76,22 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
       if (!response.ok) {
         throw new Error('Error in edit: ' + response.statusText);
       }
-      return response.json();
+      return response.json(),setOpenSnackbar(true),setSnackbarMessage('Edited successfully');
     })
     .then(() => {
       console.log("Fetch successful");
       fetchCustomers(); 
       handleClose();
       setOpenSnackbar(true);
+      setSnackbarMessage('Edited successfully');
+
 
     })
     .catch(err => console.error('Error during update:', err));
+    handleClose();
     setOpenSnackbar(true);
+    setSnackbarMessage('Edit not successfull');
+
 
   }
   

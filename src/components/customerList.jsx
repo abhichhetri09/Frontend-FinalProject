@@ -43,6 +43,27 @@ export default function CustomerList() {
       });
   };
 
+  const saveCustomer = (customer) => {
+    fetch("https://traineeapp.azurewebsites.net/api/customers", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(customer),
+    })
+    .then(response => {
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.json();
+    })
+    .then(() => {
+      setSnackbarMessage('Customer added successfully');
+      setOpenSnackbar(true);
+      fetchCustomers(); // Refresh the list after adding
+    })
+    .catch(error => {
+      console.error("Error adding customer:", error);
+      setSnackbarMessage('Error adding customer');
+      setOpenSnackbar(true);
+    });
+  };
   const deleteCustomer = (url) => {
     if (window.confirm("Are you sure?")) {
       fetch(url, { method: "DELETE" })
@@ -182,7 +203,7 @@ export default function CustomerList() {
     <>
       <div className="ag-theme-material" style={{ width: "1500px", height: "800px" }}>
         
-        <AddCustomer fetchCustomers={fetchCustomers} />
+        <AddCustomer saveCustomer={saveCustomer} />
         <Button onClick={exportToCSV}>Export to CSV</Button>
         <AgGridReact
           ref={gridRef}

@@ -37,9 +37,9 @@ function AddTraining({ onAddTraining, customerId }) {
       duration: parseInt(trainingData.duration, 10),
       customer: customerUrl // Use the full URL here
     };
-  
-    console.log("Submitting training data:", payload);
-  
+    setSnackbarMessage('Training added successfully');
+    setOpenSnackbar(true);
+
     onAddTraining(payload);
     setOpen(false);
   };
