@@ -1,12 +1,12 @@
+import React from "react";
 
-import React from 'react';
-import CustomerList from './components/customerList';
+import Dashboard from "./Dashboard";
 
 function App() {
   return (
-    <div>
-      <CustomerList />
-    </div>
+    <div className="App">
+    <Dashboard />
+  </div>
   );
 }
 

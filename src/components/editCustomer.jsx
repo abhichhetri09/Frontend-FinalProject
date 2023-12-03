@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Button from '@mui/material/Button';
+import Snackbar from "@mui/material/Snackbar";
+
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -17,18 +19,17 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
     email: '',
     phone: ''
   });
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
   useEffect(() => {
-    // Log the entire customerdata object to see its structure
-    console.log("Received customer data:", customerdata);
+   // console.log("Received customer data:", customerdata);
     const updateUrl = customerdata && customerdata._links && customerdata._links.customer && customerdata._links.customer.href;
 
-    // Log just the update URL to confirm it's what you expect
     if (updateUrl) {
-        console.log("Update URL:", updateUrl);
-        // If the update URL is present, you can now set the customer state
+       // console.log("Update URL:", updateUrl);
         setCustomer({ ...customerdata, id: extractIdFromUrl(updateUrl) }); // You'd need to write extractIdFromUrl
       } else {
-        console.error("No update URL present in customer data");
+       // console.error("No update URL present in customer data");
       }
   }, [customerdata]);
   
@@ -51,15 +52,19 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
         phone: customerdata.phone
   })
 
+
   setOpen(true);
   }
- 
+  const handleCloseSnackbar = () => {
+    setOpenSnackbar(false);
+  };
+
   const handleSave = () => {
     // Assuming the API uses the customer ID to update a customer
     const customerId = customerdata.id; // Or however you get the ID from customerdata
     const updateUrl = customerdata.links.find(link => link.rel === "customer" || link.rel === "self").href;
-    console.log("Debugging")
-    console.log("Update URL:", updateUrl); // Debugging
+   // console.log("Debugging")
+   // console.log("Update URL:", updateUrl); // Debugging
     fetch(updateUrl, {
       method: 'PUT',
       headers: { 'Content-type': 'application/json' },
@@ -72,11 +77,15 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
       return response.json();
     })
     .then(() => {
-        console.log("Fetch successful");
-      fetchCustomers(); // Assuming this updates the customer list
+      console.log("Fetch successful");
+      fetchCustomers(); 
       handleClose();
+      setOpenSnackbar(true);
+
     })
     .catch(err => console.error('Error during update:', err));
+    setOpenSnackbar(true);
+
   }
   
   const handleInputChange = (event) => {
@@ -164,6 +173,17 @@ export default function EditCustomer({customerdata, fetchCustomers}) {
           <Button onClick={handleSave}>Save</Button>
         </DialogActions>
       </Dialog>
+      <Snackbar
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+          action={
+            <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
+              Close
+            </Button>
+          }
+        />
     </>
   );
 }

@@ -1,116 +1,206 @@
-import React, { useState, useEffect } from 'react';
-import Snackbar from '@mui/material/Snackbar';
-import Button from '@mui/material/Button';
-import { AgGridReact } from 'ag-grid-react';
-import 'ag-grid-community/styles/ag-grid.css';
-import 'ag-grid-community/styles/ag-theme-alpine.css';
-import 'ag-grid-community/styles/ag-theme-material.css';
-import AddCustomer from './addCustomer';
-import EditCustomer from './editCustomer';
+import React, { useState, useEffect, useRef } from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Button from "@mui/material/Button";
+import { AgGridReact } from "ag-grid-react";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
+import "ag-grid-community/styles/ag-theme-material.css";
+import AddCustomer from "./addCustomer";
+import EditCustomer from "./editCustomer";
+import AddTraining from "./addTraining";
+import TrainingList from "./TrainingList";
+import { useNavigate } from "react-router-dom";
+
 
 export default function CustomerList() {
   const [customers, setCustomers] = useState([]);
-  const [openSnackbar, setOpenSnackbar] = useState(false); // Snackbar state
-  const [open, setOpen] = useState(false);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const gridRef = useRef();
+
+  useEffect(() => {
+    fetchCustomers();
+  }, []);
 
 
-  useEffect(() => fetchCustomers(), []);
-  const fetchData = () => {
-    fetch('https://traineeapp.azurewebsites.net/api/customers') // Updated endpoint
-      .then(response => response.json())
-      .then(data => {
-        if (data && Array.isArray(data.content)) {
-          setCustomers(data.content); // Use data.content to set customers
-        } else {
-          console.error('Unexpected customer data structure:', data);
+  const fetchCustomers = () => {
+    fetch("https://traineeapp.azurewebsites.net/api/customers")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
         }
+        return response.json();
       })
-      .catch(error => console.error('Error fetching data:', error));
+      .then((data) => {
+        setCustomers(data.content || []);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+        setSnackbarMessage('Error fetching customer data');
+        setOpenSnackbar(true);
+      });
   };
- 
+
   const deleteCustomer = (url) => {
-    if (window.confirm('Are you sure?')) {
-        fetch(url, { method: 'DELETE' })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error in delete: ' + response.statusText);
-                }
-                setOpenSnackbar(true); // Open the Snackbar on successful delete
-
-                setOpen(true);
-                fetchCustomers();
-            })
-            .catch(err => console.error(err));
+    if (window.confirm("Are you sure?")) {
+      fetch(url, { method: "DELETE" })
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error("Error in delete: " + response.statusText);
+          }
+          setSnackbarMessage('Customer deleted successfully');
+          setOpenSnackbar(true);
+          fetchCustomers();
+        })
+        .catch((err) => {
+          console.error(err);
+          setSnackbarMessage('Error in deleting customer');
+          setOpenSnackbar(true);
+        });
     }
-};
+  };
 
+  const addTraining = (trainingData) => {
 
-  
-  
-  const columnDefs = [
-    { headerName: 'First Name', field: 'firstname', sortable: true, filter: true },
-    { headerName: 'Last Name', field: 'lastname', sortable: true, filter: true },
-    { headerName: 'Street Address', field: 'streetaddress', sortable: true, filter: true },
-    { headerName: 'Post Code', field: 'postcode', sortable: true, filter: true },
-    { headerName: 'City', field: 'city', sortable: true, filter: true },
-    { headerName: 'Email', field: 'email', sortable: true, filter: true },
-    { headerName: 'Phone', field: 'phone', sortable: true, filter: true },
-    {
-        cellRenderer: params => {
-            console.log("Params data:", params.data); // Log each customer's data
-            return <EditCustomer customerdata={params.data} fetchCustomers={fetchData}/>
+    fetch("https://traineeapp.azurewebsites.net/api/trainings", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(trainingData),
+      
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Error in adding training: " + response.statusText);
         }
-    },
-    {cellRenderer: params => {
-        const deleteUrl = params.data.links.find(link => link.rel === "customer" || link.rel === "self").href;
-        return <Button size="small" onClick={() => deleteCustomer(deleteUrl)}>Delete</Button>;
-    },
-    width: 200
-}
-  ];
+        console.log("Submitting training data:", trainingData); // Use trainingData here
 
+        setSnackbarMessage('Training added successfully');
+        setOpenSnackbar(true);
+        fetchCustomers();
+      })
+      .catch((err) => {
+        console.error("Error in adding training: ", err.message);
+        setSnackbarMessage('Error in adding training');
+        setOpenSnackbar(true);
+      });
+      
+  };
 
   const handleCloseSnackbar = () => {
     setOpenSnackbar(false);
   };
 
-  const fetchCustomers = () => {
-    fetch('https://traineeapp.azurewebsites.net/api/customers')
-        .then(response => {
-            if (!response.ok)
-                throw new Error("Something went wrong" + response.statusText);
-            return response.json();
-        })
-        .then(data => {
-            if (data && Array.isArray(data.content)) {
-                setCustomers(data.content);
-            } else {
-                console.error("Received data does not have a content array:", data);
-            }
-        })
-        .catch(err => console.error(err));
-}
+  const exportToCSV = () => {
+    gridRef.current.api.exportDataAsCsv({
+      fileName: "customers.csv",
+      columnKeys: [
+        "firstname",
+        "lastname",
+        "streetaddress",
+        "postcode",
+        "city",
+        "email",
+        "phone",
+      ],
+    });
+  };
+
+  const columnDefs = [
+    {
+        headerName: "First Name",
+        field: "firstname",
+        sortable: true,
+        filter: true,
+      },
+      {
+        headerName: "Last Name",
+        field: "lastname",
+        sortable: true,
+        filter: true,
+      },
+      {
+        headerName: "Street Address",
+        field: "streetaddress",
+        sortable: true,
+        filter: true,
+      },
+      {
+        headerName: "Post Code",
+        field: "postcode",
+        sortable: true,
+        filter: true,
+      },
+      { headerName: "City", field: "city", sortable: true, filter: true },
+      { headerName: "Email", field: "email", sortable: true, filter: true },
+      { headerName: "Phone", field: "phone", sortable: true, filter: true },
+      {
+        cellRenderer: (params) => {
+            
+        console.log("Params data:", params.data); // Log each customer's data
+          return (
+            <EditCustomer customerdata={params.data} fetchCustomers={fetchCustomers} />
+          );
+        },
+      },
+      {
+        cellRenderer: (params) => {
+          const deleteUrl = params.data.links.find(
+            (link) => link.rel === "customer" || link.rel === "self"
+          ).href;
+          return (
+            <Button size="small" onClick={() => deleteCustomer(deleteUrl)}>
+              Delete
+            </Button>
+          );
+        },
+      },
+      {
+          headerName: "Actions",
+          field: "actions",
+        cellRenderer: (params) => {
+            const customerLink = params.data.links.find(link => link.rel === 'self');
+            const customerId = customerLink ? customerLink.href.split('/').pop() : null;
+          
+            console.log("Customer ID:", customerId); // Debugging line
+
+          return (
+            <>
+            
+              <AddTraining
+                onAddTraining={addTraining}
+                customerId={customerId}
+              />
+            </>
+          );
+        }
+    },
+  ];
 
   return (
     <>
-    <div className="ag-theme-material" style={{  width: "1500px", height: "700px"  }}>
-    <h1>Customers</h1>
-          <AddCustomer fetchCustomers={fetchCustomers} />
-      <AgGridReact columnDefs = {columnDefs} rowData={customers} pagination={true}
-                    paginationAutoPageSize={true}/>   
+      <div className="ag-theme-material" style={{ width: "1500px", height: "800px" }}>
+        
+        <AddCustomer fetchCustomers={fetchCustomers} />
+        <Button onClick={exportToCSV}>Export to CSV</Button>
+        <AgGridReact
+          ref={gridRef}
+          columnDefs={columnDefs}
+          rowData={customers}
+          pagination={true}
+          paginationAutoPageSize={true}
+        />
         <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={handleCloseSnackbar}
-        message="Operation Successfull"
-        action={
-          <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
-            Close
-          </Button>
-        }
-      />
-    </div>
+          open={openSnackbar}
+          autoHideDuration={6000}
+          onClose={handleCloseSnackbar}
+          message={snackbarMessage}
+          action={
+            <Button color="secondary" size="small" onClick={handleCloseSnackbar}>
+              Close
+            </Button>
+          }
+        />
+      </div>
     </>
   );
 }
-
