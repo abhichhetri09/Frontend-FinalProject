@@ -13,7 +13,9 @@ const MyCalendar = ({ trainings }) => {
       title: training.activity,
       start: moment(training.date).toDate(),
       end: moment(training.date).add(training.duration, 'minutes').toDate(),
-      allDay: false
+      allDay: false,
+      tooltip: `Activity: ${training.activity}\nCustomer: ${training.customerName}\nDuration: ${training.duration} minutes`,
+
     }));
     setEvents(formattedEvents);
   }, [trainings]);
@@ -25,6 +27,7 @@ const MyCalendar = ({ trainings }) => {
         events={events}
         startAccessor="start"
         endAccessor="end"
+        tooltipAccessor="tooltip" 
         style={{ height: '100%' }}
       />
     </div>

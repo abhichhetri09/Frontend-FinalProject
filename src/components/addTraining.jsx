@@ -12,6 +12,9 @@ import { DatePicker } from '@mui/x-date-pickers';
 
 function AddTraining({ onAddTraining, customerId }) {
   const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
   const [trainingData, setTrainingData] = useState({
     date: '',
     activity: '',

@@ -18,6 +18,7 @@ export default function AddCustomer(props) {
   });
 
   const [open, setOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
 
   const handleClickOpen = () => {
     setOpen(true);
