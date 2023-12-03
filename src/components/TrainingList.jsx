@@ -22,7 +22,7 @@ function TrainingList() {
       const trainingsData = await response.json();
       const trainingsWithCustomerName = trainingsData.map(training => ({
         ...training,
-        customerName: `${training.customer.firstname} ${training.customer.lastname}` // Concatenate first name and last name
+        customerName: `${training.customer?.firstname} ${training.customer?.lastname}` // Use optional chaining
       }));
       setTrainings(trainingsWithCustomerName);
     } catch (error) {
